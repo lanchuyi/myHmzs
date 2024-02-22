@@ -7,7 +7,7 @@
           <span class="name">黑马管理员</span>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
+          <router-link to="/workbench">
             <el-dropdown-item> 首页 </el-dropdown-item>
           </router-link>
           <a target="_blank">
@@ -27,6 +27,7 @@ export default {
   methods: {
     // 退出登录
     logout() {
+      this.$store.commit('user/delTonken')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }

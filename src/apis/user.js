@@ -13,3 +13,10 @@ export function loginAPI(data) {
     data
   })
 }
+export function getTenement(data) {
+  return request({
+    url: '/park/building',
+    method: 'get',
+    data
+  })
+}
