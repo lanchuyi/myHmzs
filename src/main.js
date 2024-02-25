@@ -2,7 +2,7 @@ import Vue from 'vue'
 import 'normalize.css/normalize.css'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import { Container, Header, Main, Footer, Pagination, Button } from 'element-ui'
+import { Container, Header, Main, Footer, Pagination, Button, Input } from 'element-ui'
 
 import '@/styles/index.scss' // global css
 
@@ -14,7 +14,7 @@ import router from './router'
 
 // 注册svg
 import '@/icons'
-
+Vue.use(Input)
 Vue.use(ElementUI)
 Vue.use(Container)
 Vue.use(Header)

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from '@/store'
+import { Message } from 'element-ui'
 const service = axios.create({
   baseURL: 'https://api-hmzs.itheima.net/tj',
   timeout: 5000 // request timeout
@@ -19,9 +20,17 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   response => {
+    if (response.config.method !== 'get') {
+      Message.success(response.data.msg)
+    }
+
     return response.data
   },
   error => {
+    if (error?.response?.data?.msg) {
+      Message.error(error.response.data.msg)
+    }
+
     return Promise.reject(error)
   }
 )

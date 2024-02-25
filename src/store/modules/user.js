@@ -22,7 +22,6 @@ export default {
     async loginAtions(store, dataobj) {
       const res = await loginAPI(dataobj)
       store.commit('setToken', res.data.token)
-      console.log(res)
     }
   }
 }

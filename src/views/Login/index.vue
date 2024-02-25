@@ -61,7 +61,7 @@ export default {
   methods: {
     async login() {
       await this.$refs.form.validate()
-      this.$store.dispatch('user/loginAtions', {
+      await this.$store.dispatch('user/loginAtions', {
         username: this.FormData.username,
         password: this.FormData.password
       })

@@ -28,6 +28,11 @@ export const routes = [
     }]
   },
   {
+    path: '/cardAdd',
+    component: () => import('@/views/Car/CarCard/add-card')
+  },
+
+  {
     path: '/park',
     component: Layout,
     permission: 'park',
@@ -118,6 +123,10 @@ export const routes = [
       meta: { title: '物业费管理', icon: 'el-icon-wallet' }
     }]
 
+  },
+  {
+    path: '/exterpriseAdd',
+    component: () => import('@/views/Park/Enterprise/add')
   },
   {
     path: '*',
