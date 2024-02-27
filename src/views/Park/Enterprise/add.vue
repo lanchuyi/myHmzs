@@ -28,7 +28,8 @@
               <el-select
                 v-model="addForm.industryCode"
               >
-                <el-option v-for="item in ProfessionList " :key="item.industryCode" :value="item.industryName" />
+                <el-option v-for="item in ProfessionList " :key="item.industryCode" :value="item.industryCode" :label="item.industryName" />
+
               </el-select>
             </el-form-item>
             <el-form-item label="企业联系人" prop="contact">
@@ -56,18 +57,27 @@
     </main>
     <footer class="add-footer">
       <div class="btn-container">
-        <el-button>重置</el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button @click="reset()">重置</el-button>
+        <el-button type="primary" @click="addSubmit('addForm')">确定</el-button>
       </div>
     </footer>
   </div>
 </template>
 
 <script>
-import { getProfessionLits, uploadAPI } from '@/apis/firm'
+import { getProfessionLits, uploadAPI, addFirm } from '@/apis/firm'
 import { validaeChineseName } from '@/utils/validate'
+import { Message } from 'element-ui'
 export default {
   data() {
+    // 验证自定义验证
+    var verify = (rule, value, callback) => {
+      if (validaeChineseName(value)) {
+        callback()
+      } else {
+        return callback(new Error('请输入正确的法人信息'))
+      }
+    }
     return {
       addForm: {
         name: '', // 企业名称
@@ -79,13 +89,14 @@ export default {
         businessLicenseUrl: '', // 营业执照url
         businessLicenseId: '' // 营业执照id
       },
+
       rules: {
         name: [
           { required: true, message: '请输入企业名称', trigger: 'blur' }
         ],
         legalPerson: [
           { required: true, message: '请输入法人', trigger: 'blur' },
-          { validator: validaeChineseName, trigger: 'blur' }
+          { validator: verify, trigger: 'blur' }
         ],
         registeredAddress: [
           { required: true, message: '请输入注册地址', trigger: 'blur' }
@@ -121,8 +132,19 @@ export default {
       this.ProfessionList = res.data
     },
     // 文件上传前
-    beforeLicenseUpload() {
-
+    beforeLicenseUpload(file) {
+      const list = ['image/jpeg', 'image/png']
+      const isJPG = list.includes(file.type)
+      const isLt3M = file.size / 1024 / 1024 < 3
+      if (!isJPG) {
+        Message.error('请上传jpg或者png图片')
+        return false
+      }
+      if (!isLt3M) {
+        Message.error('请上传小于3M的图片')
+        return false
+      }
+      return isJPG && isLt3M
     },
     // 文件上传后
     handleLicenseSuccess() {
@@ -135,6 +157,19 @@ export default {
       flier.append('type', 'businessLicense')
       const res = await uploadAPI(flier)
       this.imageUrl = res.data.url
+      this.addForm.businessLicenseUrl = res.data.url// 新增文件url
+      this.addForm.businessLicenseId = res.data.id
+    },
+    // 重置表单
+    reset() {
+      this.$refs.addForm.resetFields()
+      this.imageUrl = ''
+    //   this.$refs[addForm].resetFields()
+    },
+    // 确认提交
+    async addSubmit(addForm) {
+      await this.$refs[addForm].validate()
+      await addFirm(this.addForm)
     }
 
   }

@@ -40,8 +40,8 @@
         <el-table-column label="状态" prop="cardStatus" :formatter="formatStatus" />
         <el-table-column label="操作" fixed="right" width="180">
           <template #default="scoped">
-            <el-button size="mini" type="text">续费</el-button>
-            <el-button size="mini" type="text">查看</el-button>
+            <el-button size="mini" type="text" @click="renew('renew',scoped.row)">续费</el-button>
+            <el-button size="mini" type="text" @click="$router.push(`/viewMonthCard?id=${scoped.row.id}`)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scoped.row.id)">编辑</el-button>
             <el-button size="mini" type="text" @click="del(scoped.row.id)">删除</el-button>
           </template>
@@ -111,11 +111,13 @@ export default {
     this.getList()
   },
   methods: {
+    // 查看月卡详情
     async getList() {
       const res = await getCard(this.getObj)
       this.tableData = res.data.rows
       this.total = res.data.total
     },
+
     formatStatus(row) {
       const MAP = {
         0: '可用',
@@ -149,9 +151,14 @@ export default {
     edit(id) {
       this.$router.push(`/cardAdd?id=${id}`)
     },
+    // 删除月卡
     async del(ids) {
       await deleteCardAPI(ids)
       this.getList()
+    },
+    // 续费
+    renew(type, row) {
+      this.$router.push(`/cardAdd?id=${row.id}&type=${type}`)
     }
   }
 }

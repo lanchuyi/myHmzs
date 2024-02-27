@@ -129,6 +129,14 @@ export const routes = [
     component: () => import('@/views/Park/Enterprise/add')
   },
   {
+    path: '/exterpriseDetail',
+    component: () => import('@/views/Park/Enterprise/detail')// 查看企业
+  },
+  {
+    path: '/viewMonthCard',
+    component: () => import('@/views/Car/CarCard/viewMonthCard')// 查看月卡
+  },
+  {
     path: '*',
     component: () => import('@/views/404'),
     hidden: true

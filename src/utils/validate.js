@@ -33,7 +33,7 @@ export const validaePhone = (value) => {
 }
 // 校验中文或者英文
 export const validaeChineseOrEnglish = (value) => {
-  return /^([\u4e00-\u9fa5]{2,20}|[a-zA-Z.\s]{2,20})$/
+  return /^([\u4e00-\u9fa5]{2,20}|[a-zA-Z.\s]{2,20})$/.test(value)
 }
 // 校验数字
 export const validaeNumber = (value) => {

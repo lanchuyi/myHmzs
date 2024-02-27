@@ -57,24 +57,24 @@
                 <el-button
                   type="text"
                   size="small"
+                  @click="del(scoped.row.id)"
                 >
-                  查看
+                  删除
                 </el-button>
               </template>
             </el-table-column>
           </el-table>
         </template>
         <el-dialog
-          title="提示"
+          :title="title"
           :visible.sync="dialogVisible"
           width="30%"
           :before-close="handleClose"
         >
           <el-form
-            ref="data"
+            ref="datas"
             :label-position="labelPosition"
             label-width="100px"
-            :inline="true"
             :model="data"
             class="demo-form-inline"
             :rules="rules"
@@ -99,19 +99,28 @@
           </span>
         </el-dialog>
       </el-main>
-      <el-footer>Footer</el-footer>
+      <el-footer>
+        <el-pagination
+          :current-page="params.page"
+          :page-sizes="[10, 20, 50, 100]"
+          :page-size="params.pageSize"
+          layout="sizes, prev, pager, next,total"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </el-footer>
     </el-container>
   </div>
 </template>
 
 <script>
-import { getTenement, addUnit } from '@/apis/unit'
-// import { validaeNumber } from '@/utils/validate' // 校验添加楼宇
+import { getTenement, addUnit, editUnit, delUnit } from '@/apis/unit'
 export default {
   data() {
     return {
       params: {
-        pages: 1,
+        page: 1,
         pageSize: 20,
         name: ''
       },
@@ -144,7 +153,11 @@ export default {
           { required: true, message: '不能为空' },
           { type: 'number', message: '请输入阿拉伯数字' }
         ]
-      }
+      },
+      // 提示框标题
+      title: '',
+      // 总数据条数
+      total: null
     }
   },
   async created() {
@@ -164,15 +177,17 @@ export default {
     async getData() {
       const res = await getTenement(this.params)
       this.tableData = res.data.rows
+
+      this.total = res.data.total
     },
     inquire() {
       this.getData()
     },
     // 提交
     async verify(data) {
-      await this.$refs.data.validate()
+      await this.$refs.datas.validate()
       if (data.id) {
-        console.log('id存在')
+        await editUnit(data)
       } else {
         const res = await addUnit(data)
         this.editUnitData = res.row
@@ -181,19 +196,25 @@ export default {
       this.dialogVisible = false
     },
     // 添加楼宇
-    addU(data) {
-      if (data.id) {
-        this.$refs.data.resetFields()
-      } else { console.log(data.id) }
+    addU() {
       this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.datas.resetFields()
+      })
+      this.title = '添加楼宇'
     },
     // 编辑楼宇
     editUnit(row) {
       this.dialogVisible = true
+      this.title = '编辑楼宇'
       const { area, floors, name, propertyFeePrice } = row
       this.data = { area, floors, name, propertyFeePrice }
       this.data.id = row.id
-      console.log(this.data, 'bian')
+    },
+    // 删除楼宇
+    async  del(id) {
+      await delUnit(id)
+      this.getData()
     },
 
     // 弹框关闭确认
@@ -203,6 +224,18 @@ export default {
           done()
         })
         .catch(_ => {})
+    },
+    // 分页器页码切换
+    handleCurrentChange(val) {
+      this.params.page = val
+      console.log(this.params)
+      console.log(val)
+      this.getData()
+    },
+    // 分页器显示条数切换
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
     }
   }
 

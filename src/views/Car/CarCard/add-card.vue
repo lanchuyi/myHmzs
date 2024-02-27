@@ -9,16 +9,16 @@
         <div class="form">
           <el-form ref="carInfoForm" :model="carInfoForm" :rules="carInfoRules" label-width="100px">
             <el-form-item label="车主姓名" prop="personName">
-              <el-input v-model="carInfoForm.personName" />
+              <el-input v-model="carInfoForm.personName" :disabled="disabledData" />
             </el-form-item>
             <el-form-item label="联系方式" prop="phoneNumber">
-              <el-input v-model="carInfoForm.phoneNumber" />
+              <el-input v-model="carInfoForm.phoneNumber" :disabled="disabledData" />
             </el-form-item>
             <el-form-item label="车辆号码" prop="carNumber">
-              <el-input v-model="carInfoForm.carNumber" />
+              <el-input v-model="carInfoForm.carNumber" :disabled="disabledData" />
             </el-form-item>
             <el-form-item label="车辆品牌" prop="carBrand">
-              <el-input v-model="carInfoForm.carBrand" />
+              <el-input v-model="carInfoForm.carBrand" :disabled="disabledData" />
             </el-form-item>
           </el-form>
         </div>
@@ -66,7 +66,7 @@
 
 <script>
 import { validaeCarNumber, validaeChineseName, validaePhone } from '@/utils/validate'
-import { addCard, getCardDetailAPI, updateCardAPI } from '@/apis/car'
+import { addCard, getCardDetailAPI, updateCardAPI, CarRechargeAPI } from '@/apis/car'
 export default {
   data() {
     return {
@@ -147,14 +147,19 @@ export default {
           id: 'Cash',
           name: '线下'
         }
-      ]
-      // 编辑月卡
+      ],
+      // 输入框是否禁止使用
+      disabledData: false,
+      // 月卡车辆id
+      carId: ''
 
     }
   },
   computed: {
     title() {
-      if (this.$route.query.id) {
+      if (this.$route.query.type && this.$route.query.id) {
+        return '续费月卡'
+      } else if (this.$route.query.id) {
         return '编辑月卡'
       } else {
         return '新增月卡'
@@ -163,7 +168,10 @@ export default {
   },
 
   created() {
-    if (this.$route.query.id) {
+    if (this.$route.query.type && this.$route.query.id) {
+      this.getCarList()
+      this.disabledData = true
+    } else if (this.$route.query.id) {
       this.getCarList()
     }
   },
@@ -190,20 +198,20 @@ export default {
       obj.cardStartDate = obj.payTime[0]
       obj.cardEndDate = obj.payTime[1]
       delete obj.payTime
-      if (this.$route.query.id) {
-        console.log(obj)
-        const res = await updateCardAPI(obj)
-        console.log(res)
+      if (this.$route.query.type && this.$route.query.id) {
+        const { cardStartDate, cardEndDate, paymentAmount, paymentMethod, carInfoId } = obj
+        const CarRechargeObj = { cardStartDate, cardEndDate, paymentAmount, paymentMethod, carInfoId }
+        await CarRechargeAPI(CarRechargeObj)
+      } else if (this.$route.query.id) {
+        await updateCardAPI(obj)
       } else {
         await addCard(obj)
-        console.log(obj)
       }
 
       this.$router.back()
     },
     async getCarList() {
       const res = await getCardDetailAPI(this.$route.query.id)
-      console.log(res, '请求的列表')
       for (const key in this.carInfoForm) {
         this.carInfoForm[key] = res.data[key]
       }

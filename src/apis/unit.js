@@ -32,10 +32,26 @@ export function addUnit(data) {
     data
   })
 }
-export function edit(data) {
+/**
+ * @description: 修改楼宇
+ * @param { id,name,floors,area,propertyFeePrice}
+ * @returns
+ */
+export function editUnit(data) {
   return request({
     url: '/park/building',
     method: 'put',
     data
+  })
+}
+/**
+ * @description: 删除楼宇
+ * @param { id}
+ * @returns
+ */
+export function delUnit(id) {
+  return request({
+    url: `/park/building/${id}`,
+    method: 'delete'
   })
 }

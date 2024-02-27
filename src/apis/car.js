@@ -56,3 +56,25 @@ export function deleteCardAPI(ids) {
     method: 'DELETE'
   })
 }
+/**
+ * 查看月卡详情
+ * @param {*} data
+ * @returns
+ */
+export function getCardDetailsAPI(Id) {
+  return request({
+    url: `/parking/card/${Id}`
+  })
+}
+/**
+ * 续费月卡
+ * @param {cardStartDate,cardEndDate,paymentAmount,paymentMethod,carInfoId} data
+ * @returns
+ */
+export function CarRechargeAPI(data) {
+  return request({
+    url: `/parking/card/recharge`,
+    method: 'post',
+    data
+  })
+}
