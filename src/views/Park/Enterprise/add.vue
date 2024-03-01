@@ -4,7 +4,7 @@
       <div class="left">
         <span class="arrow" @click="$router.back()"><i class="el-icon-arrow-left" />返回</span>
         <span>|</span>
-        <span>添加企业</span>
+        <span>{{ ($route.query.id) ? '编辑企业':'添加企业' }}</span>
       </div>
       <div class="right">
         黑马程序员
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { getProfessionLits, uploadAPI, addFirm } from '@/apis/firm'
+import { getProfessionLits, uploadAPI, addFirm, editingFirm, getFirmData } from '@/apis/firm'
 import { validaeChineseName } from '@/utils/validate'
 import { Message } from 'element-ui'
 export default {
@@ -83,13 +83,13 @@ export default {
         name: '', // 企业名称
         legalPerson: '', // 法人
         registeredAddress: '', // 注册地址
-        industryCode: '', // 所在行业
+        industryCode: '', // 行业编号
         contact: '', // 企业联系人
         contactNumber: '', // 联系人电话
         businessLicenseUrl: '', // 营业执照url
         businessLicenseId: '' // 营业执照id
       },
-
+      title: '', // 页面标题
       rules: {
         name: [
           { required: true, message: '请输入企业名称', trigger: 'blur' }
@@ -123,6 +123,9 @@ export default {
     }
   },
   created() {
+    if (this.$route.query.id) {
+      this.getFrimList()
+    }
     this.getProfessionData()
   },
   methods: {
@@ -131,9 +134,16 @@ export default {
       const res = await getProfessionLits()
       this.ProfessionList = res.data
     },
+    // 获取企业列表
+    async getFrimList() {
+      const res = await getFirmData(this.$route.query.id)
+      const { name, legalPerson, registeredAddress, industryCode, industryName, businessLicenseUrl, businessLicenseName, businessLicenseId, contact, contactNumber } = res.data
+      this.addForm = { name, legalPerson, registeredAddress, industryCode, industryName, businessLicenseUrl, businessLicenseName, businessLicenseId, contact, contactNumber }
+      this.imageUrl = businessLicenseUrl
+    },
     // 文件上传前
     beforeLicenseUpload(file) {
-      const list = ['image/jpeg', 'image/png']
+      const list = ['image/jpeg', 'image/png', 'image/jpg']
       const isJPG = list.includes(file.type)
       const isLt3M = file.size / 1024 / 1024 < 3
       if (!isJPG) {
@@ -148,7 +158,6 @@ export default {
     },
     // 文件上传后
     handleLicenseSuccess() {
-
     },
     // 文件上传时的行为
     async UploadLicense(files) {
@@ -156,9 +165,9 @@ export default {
       flier.append('file', files.file)
       flier.append('type', 'businessLicense')
       const res = await uploadAPI(flier)
-      this.imageUrl = res.data.url
       this.addForm.businessLicenseUrl = res.data.url// 新增文件url
       this.addForm.businessLicenseId = res.data.id
+      this.imageUrl = this.addForm.businessLicenseUrl
     },
     // 重置表单
     reset() {
@@ -168,8 +177,16 @@ export default {
     },
     // 确认提交
     async addSubmit(addForm) {
-      await this.$refs[addForm].validate()
-      await addFirm(this.addForm)
+      if (this.$route.query.id) {
+        this.addForm.id = this.$route.query.id
+        delete this.addForm.industryName
+        delete this.addForm.businessLicenseName
+        await editingFirm(this.addForm)
+      } else {
+        await this.$refs[addForm].validate()
+        await addFirm(this.addForm)
+      }
+      this.$router.back()
     }
 
   }

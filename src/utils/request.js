@@ -3,7 +3,7 @@ import store from '@/store'
 import { Message } from 'element-ui'
 const service = axios.create({
   baseURL: 'https://api-hmzs.itheima.net/tj',
-  timeout: 5000 // request timeout
+  timeout: 15000 // request timeout
 })
 
 // 请求拦截器
@@ -29,6 +29,9 @@ service.interceptors.response.use(
   error => {
     if (error?.response?.data?.msg) {
       Message.error(error.response.data.msg)
+    }
+    if (error.code === 'ECONNABORTED') {
+      Message.error('文件过大，上传失败')
     }
 
     return Promise.reject(error)

@@ -98,3 +98,47 @@ export function getFirmData(id) {
     url: `/park/enterprise/${id}`
   })
 }
+/**
+ * 删除企业
+ * @param {企业id} rentId
+ * @returns
+ */
+
+export function delFirm(id) {
+  return request({
+    url: `/park/enterprise/${id}`,
+    method: 'delete'
+  })
+}
+/**
+ * 编辑企业
+ * @param {企业id} rentId
+ * @returns
+ */
+
+export function editingFirm(data) {
+  return request({
+    url: `/park/enterprise`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 下载合同文件
+ */
+export function downloadContract(id) {
+  return request({
+    url: `/download/${id}`,
+    responseType: 'blob'
+  })
+}
+/**
+ * 删除企业合同
+ */
+export function delContractAPI(id) {
+  return request({
+    url: `/park/enterprise/rent/${id}`,
+    method: 'delete'
+  })
+}

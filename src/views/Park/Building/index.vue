@@ -7,7 +7,7 @@
       </el-header>
       <el-main>
         <template>
-          <el-button type="primary" @click="addU(data)">添加楼宇</el-button>
+          <el-button type="primary" @click="addU('datas')">添加楼宇</el-button>
           <el-table
             :data="tableData"
             style="width: 100%"
@@ -75,27 +75,27 @@
             ref="datas"
             :label-position="labelPosition"
             label-width="100px"
-            :model="data"
+            :model="datas"
             class="demo-form-inline"
             :rules="rules"
             status-icon
           >
             <el-form-item label="楼宇名称" prop="name">
-              <el-input v-model.number="data.name" placeholder="楼宇名称" />
+              <el-input v-model.number="datas.name" placeholder="楼宇名称" />
             </el-form-item>
             <el-form-item label="层数" prop="floors">
-              <el-input v-model.number="data.floors" placeholder="层数" />
+              <el-input v-model.number="datas.floors" placeholder="层数" />
             </el-form-item>
             <el-form-item label="在管面积" prop="area">
-              <el-input v-model.number="data.area" placeholder="在管面积" />
+              <el-input v-model.number="datas.area" placeholder="在管面积" />
             </el-form-item>
             <el-form-item label="物业费单价" prop="propertyFeePrice">
-              <el-input v-model.number="data.propertyFeePrice" placeholder="物业费单价" />
+              <el-input v-model.number="datas.propertyFeePrice" placeholder="物业费单价" />
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
             <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="verify(data)">确 定</el-button>
+            <el-button type="primary" @click="verify(datas)">确 定</el-button>
           </span>
         </el-dialog>
       </el-main>
@@ -124,7 +124,7 @@ export default {
         pageSize: 20,
         name: ''
       },
-      data: {
+      datas: {
         name: '',
         floors: '',
         area: '',
@@ -184,22 +184,25 @@ export default {
       this.getData()
     },
     // 提交
-    async verify(data) {
+    async verify(datas) {
       await this.$refs.datas.validate()
-      if (data.id) {
-        await editUnit(data)
+      if (datas.id) {
+        await editUnit(datas)
       } else {
-        const res = await addUnit(data)
+        const res = await addUnit(datas)
         this.editUnitData = res.row
       }
       this.getData()
       this.dialogVisible = false
     },
     // 添加楼宇
-    addU() {
+    addU(datas) {
       this.dialogVisible = true
       this.$nextTick(() => {
-        this.$refs.datas.resetFields()
+        if (datas) {
+          this.datas = {}
+          this.$refs[datas].resetFields()
+        }
       })
       this.title = '添加楼宇'
     },
@@ -208,8 +211,8 @@ export default {
       this.dialogVisible = true
       this.title = '编辑楼宇'
       const { area, floors, name, propertyFeePrice } = row
-      this.data = { area, floors, name, propertyFeePrice }
-      this.data.id = row.id
+      this.datas = { area, floors, name, propertyFeePrice }
+      this.datas.id = row.id
     },
     // 删除楼宇
     async  del(id) {

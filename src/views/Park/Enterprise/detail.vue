@@ -49,8 +49,8 @@
               prop="address"
               label="操作"
             >
-              <template>
-                <el-button type="text">合同下载</el-button>
+              <template #default="{row}">
+                <el-button type="text" @click="down(row)">合同下载</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { getFirmData } from '@/apis/firm'
+import { getFirmData, downloadContract } from '@/apis/firm'
 export default {
   data() {
     return {
@@ -85,6 +85,15 @@ export default {
         }
       })
       this.FirmList = res.data
+    },
+    async down(row) {
+      const blob = await downloadContract(row.contractId)
+      console.log(blob)
+      const url = URL.createObjectURL(blob)
+      const thisA = document.createElement('a')
+      thisA.href = url
+      thisA.download = row.contractName
+      thisA.click()
     }
   }
 }
