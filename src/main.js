@@ -11,7 +11,7 @@ import App from './App'
 import store from './store'
 
 import router from './router'
-
+import '@/directives'
 // 注册svg
 import '@/icons'
 Vue.use(Input)

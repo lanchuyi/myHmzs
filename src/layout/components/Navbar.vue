@@ -28,6 +28,7 @@ export default {
     // 退出登录
     logout() {
       this.$store.commit('user/delTonken')
+      this.$store.commit('user/delProfile')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }

@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { getTreeListAPI, createRoleUserAPI } from '@/apis/system'
+import { getTreeListAPI, createRoleUserAPI, getRoleDetailAPI, updateRoleAPI } from '@/apis/system'
 export default {
   data() {
     return {
@@ -104,8 +104,18 @@ export default {
       perms: []
     }
   },
+  // 缓存roleId
+  computed: {
+    roleId() {
+      return this.$route.query.id
+    }
+  },
   created() {
+    console.log(this.roleId)
     this.getTreeList()
+    if (this.roleId) {
+      this.getRoleDetail()
+    }
   },
   methods: {
     async last() {
@@ -116,6 +126,11 @@ export default {
       if (this.newActive === 0) {
         await this.$refs.roleForm.validate()
         this.newActive <= 1 && this.newActive++
+        // this.$nextTick(() => {
+        //   this.$refs.diabledTree.forEach((item, index) => {
+        //     item.setCheckedKeys(this.perms[index])
+        //   })
+        // })
       } else if (this.newActive === 1) {
         this.perms = []
         this.$refs.myTree.forEach(element => {
@@ -133,9 +148,14 @@ export default {
       } else {
         this.newActive <= 1 && this.newActive++
         this.roleForm.perms = this.perms
-        await createRoleUserAPI(
-          this.roleForm
-        )
+        if (this.roleId) {
+          await updateRoleAPI(this.roleForm)
+        } else {
+          // 添加
+          await createRoleUserAPI(
+            this.roleForm
+          )
+        }
         this.$router.back()
       }
 
@@ -146,7 +166,18 @@ export default {
       const res = await getTreeListAPI()
       this.treeList = res.data
       this.setFlagFn(this.treeList)
+    },
+    // 回填数据
+    async getRoleDetail() {
+      const res = await getRoleDetailAPI(this.roleId)
+      const { perms, remark, roleId, roleName } = res.data
+      // 回填基础表单
+      this.roleForm = { perms, remark, roleId, roleName }
+      this.$refs.diabledTree.forEach((tree, index) => {
+        tree.setCheckedKeys(this.perms[index])
+      })
     }
+
   }
 }
 </script>

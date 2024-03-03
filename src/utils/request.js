@@ -3,7 +3,7 @@ import store from '@/store'
 import { Message } from 'element-ui'
 const service = axios.create({
   baseURL: 'https://api-hmzs.itheima.net/tj',
-  timeout: 15000 // request timeout
+  timeout: 50000 // request timeout
 })
 
 // 请求拦截器

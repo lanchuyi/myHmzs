@@ -299,6 +299,7 @@ export default {
     },
     // 续租
     prolonging(dis, firmscopes) {
+      console.log(dis.row)
       this.rendTitle = '续租合同'
       this.unitDisabled = true
       this.isRenewal = true

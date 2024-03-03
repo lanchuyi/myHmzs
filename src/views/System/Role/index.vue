@@ -13,7 +13,16 @@
           {{ item.roleName }}
         </div>
         <div class="more">
-          <svg-icon icon-class="more" />
+          <!-- <svg-icon icon-class="more" /> -->
+          <el-dropdown>
+            <span class="el-dropdown-link">
+              <svg-icon icon-class="more" />
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="$router.push(`/roleAdd?id=${item.roleId}`)">编辑角色</el-dropdown-item>
+              <el-dropdown-item @click.native="del(item.roleId)">删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </div>
       <el-button class="addBtn" size="mini" @click="$router.push('/roleAdd')">添加角色</el-button>
@@ -67,7 +76,7 @@
 </template>
 
 <script>
-import { getRoleListAPI, getTreeListAPI, getRoleDetailAPI, getRoleUserListAPI } from '@/apis/system'
+import { getRoleListAPI, getTreeListAPI, getRoleDetailAPI, getRoleUserListAPI, delRoleUserAPI } from '@/apis/system'
 export default {
   name: 'Role',
   data() {
@@ -129,6 +138,11 @@ export default {
       this.roleUserList = res.data.rows
       this.total = res.data.total
       console.log(res)
+    },
+    // 删除
+    async del(roleId) {
+      await delRoleUserAPI(roleId)
+      this.getList()
     }
   }
 
