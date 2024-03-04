@@ -172,8 +172,9 @@ router.beforeEach(
       next()
       if (!store.state.user.profile.id) {
         const UserRouter = []
+        // 获取用户权限列表
         const res = await store.dispatch('user/getProfile')
-
+        // 处理数据
         const newPermissions = []
         res.data.permissions.forEach(item => {
           newPermissions.push(item.split(':')[0])
@@ -183,6 +184,7 @@ router.beforeEach(
         const routerArr = asyncRoutes.filter(item => {
           return firstPerList.includes(item.permission)
         })
+        console.log(routerArr)
         if (firstPerList[0] === '*') {
           UserRouter.push(...asyncRoutes)
           UserRouter.push(...routes)
