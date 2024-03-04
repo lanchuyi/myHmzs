@@ -170,60 +170,45 @@ router.beforeEach(
     const white = ['/login']
     if (token) {
       next()
-      if (!store.state.user.profile.id) {
-        const UserRouter = []
-        // 获取用户权限列表
-        const res = await store.dispatch('user/getProfile')
-        // 处理数据
-        const newPermissions = []
+      if (!store.state.user.permissionList.id) {
+        const userRouters = []
+        const res = await store.dispatch('user/getPermissionList')
+        const fisterRouterStr = []
         res.data.permissions.forEach(item => {
-          newPermissions.push(item.split(':')[0])
+          fisterRouterStr.push(...item.split(':', [1]))
         })
-
-        const firstPerList = Array.from(new Set(newPermissions))
-        const routerArr = asyncRoutes.filter(item => {
-          return firstPerList.includes(item.permission)
-        })
-        console.log(routerArr)
-        if (firstPerList[0] === '*') {
-          UserRouter.push(...asyncRoutes)
-          UserRouter.push(...routes)
+        // 一级列表关键字
+        const fisterRouterList = Array.from(new Set(fisterRouterStr))
+        console.log(fisterRouterList)
+        if (fisterRouterList === '*') {
+          userRouters.push(...asyncRoutes)
+          userRouters.push(...routes)
           const arr = [...asyncRoutes]
-          arr.push({
-            path: '*',
+          arr.push({ path: '*',
             component: () => import('@/views/404'),
-            hidden: true
-          })
-          store.commit('user/setUserRouer', UserRouter)
-          arr.forEach(item => {
-            router.addRoute(item)
-          })
+            hidden: true })
+          store.commit('user/setUserRouer', userRouters)
         } else {
-          // 二级路由
-          let secondList = res.data.permissions.map(item => {
-            const arr = item.lastIndexOf(':')
-            const secondStr = item.substr(0, arr)
-            return secondStr
+          // 二级列表关键字
+          const secondStr = []
+          res.data.permissions.forEach(item => {
+            secondStr.push(((item.split(':')).splice(0, 2)).join(':'))
           })
-
-          secondList = Array.from(new Set(secondList))
-          const newsecondList = routerArr.map(item => {
-            const resArr = item.children.filter(item => {
+          const secondList = Array.from(new Set(secondStr))
+          // 一级列表
+          const userFisterRouterList = asyncRoutes.filter(item => {
+            return fisterRouterList.includes(item.permission)
+          }).filter(item => {
+            // 二级列表
+            // eslint-disable-next-line no-return-assign
+            return item.children = item.children.filter(item => {
               return secondList.includes(item.permission)
             })
-            const newsecondObj = { ...item }
-            newsecondObj.children = resArr
-            return newsecondObj
           })
-          UserRouter.push(...newsecondList)
-          UserRouter.push(...routes)
-          store.commit('user/setUserRouer', UserRouter)
-          // 问题:点击筛选后的路由对象，跳转不了
-          // -原因:new Router 时 routes 里只有静态的路由规则对象，匹配的只有这些静态的
-          // 动态:网络请求回来在给 routes 数组本身添加，影响不了 router 路由对象里使用的路由规则
-          // 解决:router 给我们一个 addRoute 方法可以动态追加可以““匹配”用的路由对象
-
-          newsecondList.forEach(item => {
+          userRouters.push(...userFisterRouterList)
+          userRouters.push(...routes)
+          store.commit('user/setUserRouer', userRouters)
+          userFisterRouterList.forEach(item => {
             router.addRoute(item)
           })
         }

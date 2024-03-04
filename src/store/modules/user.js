@@ -6,8 +6,8 @@ export default {
   state() {
     return {
       token: getToken() || '', // 获取token，如果为空，则返回空字符串，否则返回token字符串
-      profile: {},
-      userRouer: []// 路由权限
+      permissionList: {}, // 用户权限信息列表
+      userRouer: []
     }
   },
   mutations: {
@@ -19,15 +19,11 @@ export default {
       state.token = ''
       removeToken()
     },
+    setPermissionList(state, data) {
+      state.permissionList = data
+    },
     setUserRouer(state, data) {
       state.userRouer = data
-    },
-    setProfile(state, data) {
-      state.profile = data
-    },
-    delProfile(state) {
-      state.profile = {}
-      state.userRouer = []
     }
 
   },
@@ -36,10 +32,11 @@ export default {
       const res = await loginAPI(dataobj)
       store.commit('setToken', res.data.token)
     },
-    async getProfile(store) {
-      const permision = await getProfileAPI()
-      store.commit('setProfile', permision.data)
-      return permision
+    async getPermissionList(store) {
+      const res = await getProfileAPI()
+      store.commit('setPermissionList', res.data)
+      return res
     }
+
   }
 }
