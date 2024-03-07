@@ -90,3 +90,13 @@ export function getRuleListAPI(params) {
     params
   })
 }
+/** 获取停车缴费列表
+ * @param{page, pageSize}
+ */
+export function getPaymentListAPI(params) {
+  return request({
+    url: '/parking/payment/list',
+    params
+  })
+}
+

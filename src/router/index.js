@@ -179,7 +179,6 @@ router.beforeEach(
         })
         // 一级列表关键字
         const fisterRouterList = Array.from(new Set(fisterRouterStr))
-        console.log(fisterRouterList, 's')
         if (fisterRouterList[0] === '*') {
           console.log(11)
           userRouters.push(...asyncRoutes)

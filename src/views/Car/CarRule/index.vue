@@ -27,7 +27,7 @@
       </el-table>
     </div>
     <!-- dilog -->
-    <el-dialog title="收货地址" :visible="dialogFormVisible">
+    <el-dialog title="收货地址" :visible="dialogFormVisible" :close-on-click-modal="true">
       <el-form ref="form" :model="ruleForm" label-width="80px" size="mini">
         <el-form-item label="周边规则编号">
           <el-input v-model="ruleForm.ruleNumber" class="Rulenumber" />
@@ -104,7 +104,7 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submit()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -202,16 +202,31 @@ export default {
     // 新增规则
     addRule() {
       this.dialogFormVisible = true
+      console.log(this.ruleForm)
     },
     // 机器类型
     change(value) {
       console.log(value, 'v')
-      console.log(this.ruleForm.chargeType)
+      if (value === 'duration') {
+        console.log(111)
+        this.ruleForm.turnPrice = null
+        this.ruleForm.partitionFrameTime = null
+        this.ruleForm.partitionFramePrice = null
+        this.ruleForm.partitionIncreaseTime = null
+        this.ruleForm.partitionIncreasePrice = null
+      }
     },
     // 免费时长
     handleChange(val, chargeType) {
       console.log(val)
       console.log(chargeType)
+    },
+    // 提交
+    submit() {
+      delete this.ruleForm.durationType
+      this.ruleForm.durationType = this.durationTypeValue
+      console.log(this.durationTypeValue)
+      console.log(this.ruleForm)
     }
   }
 }
