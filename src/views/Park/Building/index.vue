@@ -55,6 +55,7 @@
                   编辑
                 </el-button>
                 <el-button
+                  v-auth-dir="'park:building:remove'"
                   type="text"
                   size="small"
                   @click="del(scoped.row.id)"

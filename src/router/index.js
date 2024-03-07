@@ -179,8 +179,9 @@ router.beforeEach(
         })
         // 一级列表关键字
         const fisterRouterList = Array.from(new Set(fisterRouterStr))
-        console.log(fisterRouterList)
-        if (fisterRouterList === '*') {
+        console.log(fisterRouterList, 's')
+        if (fisterRouterList[0] === '*') {
+          console.log(11)
           userRouters.push(...asyncRoutes)
           userRouters.push(...routes)
           const arr = [...asyncRoutes]
@@ -188,6 +189,9 @@ router.beforeEach(
             component: () => import('@/views/404'),
             hidden: true })
           store.commit('user/setUserRouer', userRouters)
+          arr.forEach(item => {
+            router.addRoute(item)
+          })
         } else {
           // 二级列表关键字
           const secondStr = []

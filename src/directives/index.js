@@ -16,3 +16,17 @@
 //     }
 //   }
 // })
+import store from '@/store'
+import Vue from 'vue'
+Vue.directive('auth-dir', {
+  inserted(el, binding, vnode) {
+    const perm = store.state.user.permissionList.permissions
+    const superPerm = '*:*:*'
+    if (!perm.includes(binding.value)) {
+      el.remove()
+    } else if (superPerm.includes(binding.value)) {
+      // 管理员
+    }
+  }
+})
+
