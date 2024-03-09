@@ -21,81 +21,40 @@
           :data="tableData"
           style="width: 100%"
         >
-          <el-table-column
-            label="序号"
-            width="100"
-            type="index"
-            :index="1"
-          />
-          <el-table-column
-            prop="poleName"
-            label="一体杆名称"
-            width="160"
-          />
-          <el-table-column
-            prop="poleNumber"
-            label="一体杆编号"
-            width="120"
-          />
-          <el-table-column
-            prop="poleIp"
-            label="一体杆IP		"
-            width="160"
-          />
-          <el-table-column
-            prop="areaName"
-            label="安装区域"
-            width="160"
-          />
-          <el-table-column
-            label="一体杆类型	"
-            width="100"
-          >
-            <template #default="{row}">
-              {{ poleTypeData[row.poleType] }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="运行状态"
-            width="100"
-          >
-            <template #default="{row}">
-              {{ row.poleStatus=== 1 ?'异常':'正常' }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="操作"
-            width="100"
-          >
-            <template #default="{row}">
-              <el-button type="text" @click="emit(row)">编辑</el-button>
-              <el-button type="text">删除</el-button>
+          <el-table-column v-for="(column, index) in tableColumns" :key="index" :label="column.label" :prop="column.prop" :width="column.width">
+            <template slot-scope="scope">
+              <template v-if="column.prop === 'poleStatus'">
+                {{ column.prop === 'poleStatus' ? (scope.row.poleStatus === 1 ? '异常' : '正常') : '' }}
+              </template>
+              <template v-else-if="column.label === '序号'">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+              <template v-else-if="column.prop === 'poleType'">
+                <span>{{ poleTypeData[scope.row.poleType] }}</span>
+              </template>
+              <template v-else-if="column.label === '操作'">
+                <span><a style="color: blue; margin-right: 10px;" href="#">删除</a></span>
+                <span><a style="color: blue;" href="#" @click.prevent="emit(scope.row)">编辑</a></span>
+              </template>
+              <template v-else>
+                {{ scope.row[column.prop] }}
+              </template>
             </template>
           </el-table-column>
         </el-table>
         <el-dialog title="收货地址" :visible="dialogFormVisible">
           <el-form :model="form">
-            <el-form-item label="一体杆名称" :label-width="formLabelWidth">
-              <el-input v-model="form.areaName" autocomplete="off" />
+            <el-form-item v-for="(item, index) in formItems" :key="index" :label="item.label">
+              <template v-if="item.type === 'input'">
+                <el-input v-model="form[item.prop]" autocomplete="off" />
+              </template>
+              <template v-else-if="item.type === 'select'">
+                <el-select v-model="form[item.prop]" :placeholder="item.placeholder">
+                  <el-option v-for="(option, optionIndex) in item.options" :key="optionIndex" :label="option.label" :value="value" />
+                </el-select>
+              </template>
             </el-form-item>
-            <el-form-item label="一体杆编号" :label-width="formLabelWidth">
-              <el-input v-model="form.poleNumber" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="一体杆IP" :label-width="formLabelWidth">
-              <el-input v-model="form.poleIp" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="关联区域" :label-width="formLabelWidth">
-              <el-select v-model="form.region" placeholder="请选择活动区域">
-                <el-option label="区域一" value="shanghai" />
-                <el-option label="区域二" value="beijing" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="一体杆类型" :label-width="formLabelWidth">
-              <el-select v-model="form.region" placeholder="请选择活动区域">
-                <el-option label="区域一" value="shanghai" />
-                <el-option label="区域二" value="beijing" />
-              </el-select>
-            </el-form-item>
+
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -142,6 +101,16 @@ export default {
       value: '',
       // 表格数据
       tableData: [],
+      tableColumns: [
+        { label: '序号', prop: '', width: '100' },
+        { label: '一体杆名称', prop: 'poleName', width: '160' },
+        { label: '一体杆编号', prop: 'poleNumber', width: '120' },
+        { label: '一体杆IP', prop: 'poleIp', width: '160' },
+        { label: '安装区域', prop: 'areaName', width: '160' },
+        { label: '一体杆类型', prop: 'poleType', width: '100' },
+        { label: '运行状态', prop: 'poleStatus', width: '100' },
+        { label: '操作', prop: '', width: '100' } // 操作列不需要 prop
+      ],
       // 总数据条数
       total: null,
       // 收费类型字典对象
@@ -152,9 +121,23 @@ export default {
       },
       // 弹窗是否关闭
       dialogFormVisible: false,
+      // 回显表单
       form: {
 
-      }
+      },
+      formItems: [
+        { type: 'input', label: '一体杆名称', prop: 'areaName' },
+        { type: 'input', label: '一体杆编号', prop: 'poleNumber' },
+        { type: 'input', label: '一体杆IP', prop: 'poleIp' },
+        { type: 'select', label: '关联区域', prop: 'region', options: [
+          { label: '区域一', value: 'shanghai' },
+          { label: '区域二', value: 'beijing' }
+        ] },
+        { type: 'select', label: '一体杆类型', prop: 'poleType', options: [
+          { label: '类型一', value: 'type1' },
+          { label: '类型二', value: 'type2' }
+        ] }
+      ]
 
     }
   },
@@ -190,10 +173,13 @@ export default {
     },
     // 编辑
     emit(row) {
+      console.log(row)
       const { areaName, poleNumber, poleIp
       } = row
       this.form = { areaName, poleNumber, poleIp
       }
+      console.log(this.form)
+      this.dialogFormVisible = true
     }
 
   }

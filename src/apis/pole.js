@@ -20,3 +20,14 @@ export function getDropListAPI(param) {
     url: '/parking/area/dropList'
   })
 }
+/**
+ * 查看告警记录列表
+ * @param {page,pageSize,poleName,poleNumber,handleStatus}
+ * @returns
+ */
+export function getAlarmListAPI(params) {
+  return request({
+    url: '/pole/warning/list',
+    params
+  })
+}
